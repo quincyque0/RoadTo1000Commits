@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/RoadTo1000Commits.iml" filepath="$PROJECT_DIR$/.idea/RoadTo1000Commits.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RoadTo1000Commits.main.iml" filepath="$PROJECT_DIR$/.idea/modules/RoadTo1000Commits.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RoadTo1000Commits.test.iml" filepath="$PROJECT_DIR$/.idea/modules/RoadTo1000Commits.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/kotlin/kotlin.iml" filepath="$PROJECT_DIR$/kotlin/kotlin.iml" />
     </modules>
   </component>
