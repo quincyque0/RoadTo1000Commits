@@ -4,7 +4,7 @@ import kotlin.math.pow
 import java.util.Timer
 import java.util.TimerTask
 
-class Human {
+open class Human {
     var x: Double = 0.0
     var y: Double = 0.0
     var name: String = ""
@@ -23,9 +23,6 @@ class Human {
         println("We created class with name $name")
     }
 
-    fun move() {
-        println("Human is moving from current position ($x, $y)")
-    }
 
     fun stopMovement() {
         timer?.cancel()
@@ -91,6 +88,18 @@ class Human {
     private fun calculateDistance(x1: Double, y1: Double, x2: Double, y2: Double): Double {
         return sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
     }
+}
+class Driver : Human {
+    var car_model: String = ""
+    var rotate_driving: Double = 0.0;
+
+    constructor(
+        _age: Int,
+        _curspeed: Int
+    ) : super("","","",_age, _curspeed)
+
+
+
 }
 
 fun main() {
