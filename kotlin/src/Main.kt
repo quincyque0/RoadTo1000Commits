@@ -29,7 +29,7 @@ fun main() {
     }
 
     println("Simulation will run for 10 seconds")
-    Thread.sleep(30000)
+    Thread.sleep(10000)
 
     println("\n=== Stopping all movements ===")
     humans.forEach {
