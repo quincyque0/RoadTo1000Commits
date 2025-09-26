@@ -4,11 +4,10 @@ import Interfaces.Movable
 import kotlin.random.Random
 import kotlin.math.sqrt
 import kotlin.math.pow
-import kotlin.concurrent.thread
 import java.util.Timer
+import kotlin.concurrent.thread
 
-
-open class HumanInterfaced : Movable{
+open class HumanInterfaced : Movable {
     override var x: Double = 0.0
     override var y: Double = 0.0
     var name: String = ""

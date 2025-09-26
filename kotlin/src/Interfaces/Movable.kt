@@ -1,10 +1,10 @@
 package Interfaces
 
-public interface Movable{
+public interface Movable {
     var x: Double
     var y: Double
     var currentSpeed: Int
-    fun moveTo(targetX: Double, targetY: Double){
+    fun moveTo(targetX: Double, targetY: Double) {
         println("go to")
     }
 }
