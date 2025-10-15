@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">segunda_Etapa</string>
+    <string name="app_name">Калькулятор</string>
+    <string name="first">Введите первое число</string>
+    <string name="second">Введите второе число</string>
+    <string name="calculate">=</string>
 </resources>
