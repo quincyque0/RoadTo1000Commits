@@ -1,12 +1,12 @@
 package com.example.segunda_etapa
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.TextView;
-import android.widget.EditText;
 import android.widget.Button;
 
 class StringHandler {
@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         math = findViewById(R.id.result)
         math.setText("")
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                     "Ошибка"
                 } else {
                     if (res % 1 == 0.0) {
-                        res.toInt().toString()
+                        res.toDouble().toString()
                     } else {
                         String.format("%.6f", res)
                     }
