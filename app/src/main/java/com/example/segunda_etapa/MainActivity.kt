@@ -91,12 +91,12 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun append(value: String) {
-        val cur = math.text.toString()
+        val cur = math.text.toString().replace(',','.')
         math.setText(cur + value)
         calculate.add(value)
     }
     private fun calculating() {
-        val mathing = math.text.toString()
+        val mathing = math.text.toString().replace(',','.')
         if ( mathing.isNotEmpty()) {
             calculate.getline( mathing)
             val res = calculate.process()
@@ -106,16 +106,17 @@ class MainActivity : AppCompatActivity() {
                     "Ошибка"
                 } else {
                     if (res % 1 == 0.0) {
-                        res.toDouble().toString()
+                        res.toDouble().toString().replace(',','.')
+
                     } else {
-                        String.format("%.6f", res)
+                        String.format("%.6f", res).replace(',','.')
                     }
                 }
             )
 
             calculate.clear()
 
-            calculate.add(math.text.toString())
+            calculate.add(math.text.toString().replace(',','.'))
         }
     }
 
