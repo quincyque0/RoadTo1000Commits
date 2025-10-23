@@ -22,7 +22,7 @@ class MusicPlayer : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var isPlaying = false
     private var isRepeat = false
-    private var isFavorite = false
+
 
 
 
@@ -37,6 +37,7 @@ class MusicPlayer : AppCompatActivity() {
     private lateinit var MaxTime: TextView
     private lateinit var SongTitle: TextView
     private lateinit var Artist: TextView
+    private lateinit var MusicImage: ImageView
 
 
     private fun initViews() {
@@ -50,6 +51,7 @@ class MusicPlayer : AppCompatActivity() {
         MaxTime = findViewById(R.id.MusicMaxTime)
         SongTitle = findViewById(R.id.Title)
         Artist = findViewById(R.id.Artist)
+        MusicImage = findViewById(R.id.MusicIMG)
     }
 
     private var currentSongIndex = 0
@@ -131,10 +133,11 @@ class MusicPlayer : AppCompatActivity() {
 
         Repeat.setOnClickListener {
             isRepeat = !isRepeat
+            updateAllIncurrent()
         }
 
         Like.setOnClickListener {
-            isFavorite = true
+            likeChange(currentSongIndex)
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -160,6 +163,8 @@ class MusicPlayer : AppCompatActivity() {
                 Artist.text = playlist[index].artist
                 seekBar.max = mediaPlayer.duration
                 MaxTime.text = TimeToText(mediaPlayer.duration)
+
+                updateAllIncurrent()
 
                 playMusic()
             } catch (e: Exception) {
@@ -220,6 +225,30 @@ class MusicPlayer : AppCompatActivity() {
         mediaPlayer.release()
         handler.removeCallbacks(updateProgress)
     }
+    private fun updateIcon(icon: Int) {
+        Like.setImageResource(icon)
+    }
+    private fun likeChange(id: Int) {
+        playlist[id].licked = !playlist[id].licked
+        updateAllIncurrent()
 
+    }
+    private fun updateImage(id: Int){
+        if(playlist[id].imageId != null){
+            MusicImage.setImageResource(playlist[id].imageId as Int)
+        }
+    }
+    private fun updateAllIncurrent(){
+        updateImage(currentSongIndex)
+        if (playlist[currentSongIndex].licked)
+            updateIcon(R.drawable.ic_heart)
+        else
+            updateIcon(R.drawable.ic_heart_like)
+        if(isRepeat){
+            Repeat.setImageResource(R.drawable.ic_replay_active)
+        }else
+            Repeat.setImageResource(R.drawable.ic_repeat)
+
+    }
 
 }

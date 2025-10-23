@@ -88,10 +88,27 @@
             android:text="TextView"
             android:textAlignment="center"
             android:textSize="24sp" />
+
+        <ImageView
+            android:id="@+id/MusicIMG"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="70dp"
+            android:adjustViewBounds="false"
+            android:scaleType="centerCrop"
+            android:src="@drawable/no_img"
+            android:background="@drawable/borderes_16"
+            android:clipToOutline="true" />
+
+
         <TextView
             android:id="@+id/Artist"
-            android:layout_width="366dp"
-            android:layout_height="40dp"
+            android:layout_width="360dp"
+            android:layout_height="35dp"
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
             android:layout_marginTop="0dp"
