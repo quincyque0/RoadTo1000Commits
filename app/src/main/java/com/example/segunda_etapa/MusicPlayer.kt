@@ -38,6 +38,7 @@ class MusicPlayer : AppCompatActivity() {
     private lateinit var SongTitle: TextView
     private lateinit var Artist: TextView
     private lateinit var MusicImage: ImageView
+    private lateinit var Exit: ImageButton
 
 
     private fun initViews() {
@@ -52,6 +53,7 @@ class MusicPlayer : AppCompatActivity() {
         SongTitle = findViewById(R.id.Title)
         Artist = findViewById(R.id.Artist)
         MusicImage = findViewById(R.id.MusicIMG)
+        Exit = findViewById(R.id.Exit)
     }
 
     private var currentSongIndex = 0
@@ -72,6 +74,7 @@ class MusicPlayer : AppCompatActivity() {
 
         mediaPlayer = MediaPlayer()
         loadSong(currentSongIndex)
+
         handler.postDelayed(updateProgress, 1000)
 
         Layout = findViewById(R.id.drawer_layout)
@@ -187,13 +190,22 @@ class MusicPlayer : AppCompatActivity() {
     }
 
     private fun nextSong() {
-        currentSongIndex = (currentSongIndex + 1) % playlist.size
-        loadSong(currentSongIndex)
+        if(isRepeat == false){
+            currentSongIndex = (currentSongIndex + 1) % playlist.size
+            loadSong(currentSongIndex)
+        }else{
+            loadSong(currentSongIndex)
+        }
     }
 
+
     private fun backSong() {
-        currentSongIndex = if (currentSongIndex - 1 < 0) playlist.size - 1 else currentSongIndex - 1
-        loadSong(currentSongIndex)
+        if(isRepeat == false){
+            currentSongIndex = if (currentSongIndex - 1 < 0) playlist.size - 1 else currentSongIndex - 1
+            loadSong(currentSongIndex)
+        }else{
+            loadSong(currentSongIndex)
+        }
     }
     private val updateProgress = object : Runnable {
         override fun run() {

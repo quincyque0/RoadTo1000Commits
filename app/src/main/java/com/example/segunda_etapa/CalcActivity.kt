@@ -79,7 +79,7 @@ class CalcActivity : AppCompatActivity() {
         getSupportActionBar()?.hide()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        main = Intent(this, MPActivity::class.java)
+//        main = Intent(this, MainActivity::class.java)
 
 
         math = findViewById(R.id.result)

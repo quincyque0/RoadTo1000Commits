@@ -24,9 +24,7 @@
             android:name=".CalcActivity"
             android:exported="false"/>
 
-        <activity
-            android:name=".MPActivity"
-            android:exported="false"/>
+
         <activity
             android:name=".MusicPlayer"
             android:exported="false"/>
