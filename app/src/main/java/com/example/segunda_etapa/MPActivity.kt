@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 
 
-class MPActivity : AppCompatActivity() {
+class   MPActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
