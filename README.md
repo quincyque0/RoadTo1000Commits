@@ -61,7 +61,7 @@ Fragment представляет собой повторно используе
 <img width="447" height="507" alt="изображение" src="https://github.com/user-attachments/assets/1ea3f123-e6c2-4de9-b804-f3c575b9e72c" />
 
 
-
+Fragment manager позволяет запускать одновремеено с работающей активностью активности фрагментов
 <img width="822" height="302" alt="изображение" src="https://github.com/user-attachments/assets/6d2be1e6-7dd0-404c-9d78-6fb12733583a" />
 
 FragmentManager
