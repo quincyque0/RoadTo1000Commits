@@ -23,6 +23,9 @@
         <activity
             android:name=".CalcActivity"
             android:exported="false"/>
+        <activity
+            android:name=".testActivity"
+            android:exported="false"/>
 
 
         <activity

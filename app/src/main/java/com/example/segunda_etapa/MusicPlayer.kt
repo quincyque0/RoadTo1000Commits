@@ -1,6 +1,11 @@
 package com.example.segunda_etapa
 
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import android.media.MediaPlayer
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
 
 
 class MusicPlayer : AppCompatActivity() {
@@ -22,6 +29,8 @@ class MusicPlayer : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var isPlaying = false
     private var isRepeat = false
+    private var currentSongIndex = 0
+    var playlist = mutableListOf<Song>()
 
 
 
@@ -39,6 +48,9 @@ class MusicPlayer : AppCompatActivity() {
     private lateinit var Artist: TextView
     private lateinit var MusicImage: ImageView
     private lateinit var Exit: ImageButton
+    private lateinit var Upload: ImageButton
+    private lateinit var mediaMetadataRetriever: MediaMetadataRetriever
+
 
 
     private fun initViews() {
@@ -54,12 +66,11 @@ class MusicPlayer : AppCompatActivity() {
         Artist = findViewById(R.id.Artist)
         MusicImage = findViewById(R.id.MusicIMG)
         Exit = findViewById(R.id.Exit)
+        Upload = findViewById(R.id.upload)
     }
 
-    private var currentSongIndex = 0
 
-    private val playlist = listOf(Song("Song 1", "aurarosh",R.drawable.subaru, R.raw.requiem_of_silence,false),
-        Song("Song 2","serega", R.drawable.gojo, R.raw.twerknation_number,false))
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +82,9 @@ class MusicPlayer : AppCompatActivity() {
         initViews()
         setupListeners()
 
-
+        mediaMetadataRetriever = MediaMetadataRetriever()
         mediaPlayer = MediaPlayer()
-        loadSong(currentSongIndex)
+
 
         handler.postDelayed(updateProgress, 1000)
 
@@ -117,6 +128,7 @@ class MusicPlayer : AppCompatActivity() {
             )
     }
 
+
     private fun setupListeners() {
         PlayPause.setOnClickListener {
             if (isPlaying) {
@@ -133,14 +145,19 @@ class MusicPlayer : AppCompatActivity() {
         Next.setOnClickListener {
             nextSong()
         }
+        Upload.setOnClickListener {
+            upload()
+        }
 
         Repeat.setOnClickListener {
-            isRepeat = !isRepeat
-            updateAllIncurrent()
+            if (playlist.size!= 0){
+                isRepeat = !isRepeat
+                updateAllIncurrent()}
         }
 
         Like.setOnClickListener {
-            likeChange(currentSongIndex)
+            if(playlist.size!= 0)
+                likeChange(currentSongIndex)
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -155,75 +172,122 @@ class MusicPlayer : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
-        private fun loadSong(index: Int) {
-            try {
-                mediaPlayer.reset()
-                mediaPlayer.setDataSource(resources.openRawResourceFd(playlist[index].audioId))
-                mediaPlayer.prepare()
-
-
-                SongTitle.text = playlist[index].title
-                Artist.text = playlist[index].artist
-                seekBar.max = mediaPlayer.duration
-                MaxTime.text = TimeToText(mediaPlayer.duration)
-
-                updateAllIncurrent()
-
-                playMusic()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this, "Error loading song", Toast.LENGTH_SHORT).show()
-            }
+    private fun upload(){
+        val mediaPickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            type = "audio/*"
+            addCategory(Intent.CATEGORY_OPENABLE)
         }
 
 
+        filePickerLauncher.launch(mediaPickerIntent)
+    }
+    private val filePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data: Intent? = result.data
+            val uri: Uri? = data?.data
+            if (uri != null) {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+
+            }
+            var new : Song = getMusicInfo(this,uri)
+            playlist.add(new)
+            currentSongIndex = playlist.size - 1
+            play(playlist[currentSongIndex])
+            updateSongInfo(playlist[currentSongIndex])
+
+        }
+
+
+    }
+    private fun getMusicInfo(context: Context,uri: Uri?) : Song{
+
+        mediaMetadataRetriever.setDataSource(context, uri)
+        var title =
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                ?: "Unknown Title"
+        var author =
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
+                ?: "Unknown Author"
+        var artBit = mediaMetadataRetriever.embeddedPicture
+
+        val art : Bitmap? = if (artBit != null) {
+            BitmapFactory.decodeByteArray(artBit, 0, artBit.size)
+        } else null;
+        return Song(title, author, art, uri, false)
+
+
+    }
+    fun play(song: Song){
+        mediaPlayer.reset()
+        if(song.uri != null)    mediaPlayer.setDataSource(this,song.uri)
+        mediaPlayer.setOnPreparedListener {
+            mediaPlayer.start()
+            isPlaying = true
+            PlayPause.setImageResource(R.drawable.ic_stop)
+            updateSongInfo(song)
+        }
+        mediaPlayer.prepareAsync()
+
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+        mediaMetadataRetriever.release()
+    }
+
     private fun playMusic() {
-        mediaPlayer.start()
-        isPlaying = true
-        PlayPause.setImageResource(R.drawable.ic_stop)
+        if(isPlaying == false && playlist.size != 0){
+            if (mediaPlayer.currentPosition == 0 || !mediaPlayer.isPlaying) {
+                play(playlist[currentSongIndex])
+            } else {
+                mediaPlayer.start()
+            }
+        }
     }
 
     private fun pauseMusic() {
-        mediaPlayer.pause()
-        isPlaying = false
-        PlayPause.setImageResource(R.drawable.ic_play)
+        if(isPlaying == true)
+        {
+            mediaPlayer.stop()
+            PlayPause.setImageResource(R.drawable.ic_play)
+            isPlaying = false
+        }
     }
 
     private fun nextSong() {
-        if(isRepeat == false){
-            currentSongIndex = (currentSongIndex + 1) % playlist.size
-            loadSong(currentSongIndex)
-        }else{
-            loadSong(currentSongIndex)
-        }
-    }
+        if(playlist.size != 0){
+            if(currentSongIndex +1 != playlist.size) {
+                currentSongIndex += 1
+                play(playlist[currentSongIndex])
+            }
+            else {
+                currentSongIndex = 0
+                play(playlist[currentSongIndex])
+            }
+    }}
 
 
     private fun backSong() {
-        if(isRepeat == false){
-            currentSongIndex = if (currentSongIndex - 1 < 0) playlist.size - 1 else currentSongIndex - 1
-            loadSong(currentSongIndex)
-        }else{
-            loadSong(currentSongIndex)
-        }
-    }
+        if(playlist.size != 0){
+            if (currentSongIndex > 0) {
+                currentSongIndex -= 1
+            } else {
+                currentSongIndex = playlist.size - 1
+            }
+            play(playlist[currentSongIndex])
+    }}
     private val updateProgress = object : Runnable {
         override fun run() {
-            if (mediaPlayer.isPlaying) {
+            if (isPlaying && mediaPlayer.isPlaying) {
+                val cur = TimeToText(mediaPlayer.currentPosition)
+                CurTime.text = cur
                 seekBar.progress = mediaPlayer.currentPosition
-                CurTime.text = TimeToText(mediaPlayer.currentPosition)
             }
-
-            if (mediaPlayer.currentPosition >= mediaPlayer.duration - 1000) {
-                if (isRepeat) {
-                    mediaPlayer.seekTo(0)
-                    mediaPlayer.start()
-                } else {
-                    nextSong()
-                }
-            }
-
-            handler.postDelayed(this, 1000)
+            handler.postDelayed(this,1000)
         }
     }
 
@@ -232,11 +296,7 @@ class MusicPlayer : AppCompatActivity() {
         val seconds = milliseconds / 1000 % 60
         return String.format("%d:%02d", minutes, seconds)
     }
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaPlayer.release()
-        handler.removeCallbacks(updateProgress)
-    }
+
     private fun updateIcon(icon: Int) {
         Like.setImageResource(icon)
     }
@@ -246,9 +306,23 @@ class MusicPlayer : AppCompatActivity() {
 
     }
     private fun updateImage(id: Int){
-        if(playlist[id].imageId != null){
-            MusicImage.setImageResource(playlist[id].imageId as Int)
+        if(playlist[id].bitmap!= null){
+            MusicImage.setImageResource(playlist[id].bitmap as Int)
         }
+    }
+    private fun updateSongInfo(song: Song) {
+        SongTitle.text = song.title
+        Artist.text = song.artist
+        if (song.bitmap != null) {
+            MusicImage.setImageBitmap(song.bitmap)
+        } else {
+            MusicImage.setImageResource(R.drawable.no_img)
+        }
+
+        MaxTime.text = TimeToText(mediaPlayer.duration)
+        seekBar.max = mediaPlayer.duration
+
+        updateAllIncurrent()
     }
     private fun updateAllIncurrent(){
         updateImage(currentSongIndex)
