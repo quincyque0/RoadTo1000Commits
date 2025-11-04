@@ -20,6 +20,8 @@
 | **Stopped**           | `stop()`                         | Подготовить заново     |
 | **PlaybackCompleted** | После конца трека                | `start()` снова        |
 | **End**               | `release()`                      | Плеер уничтожен        |
+
+
 ![Uploading изображение.png…]()
 
 
