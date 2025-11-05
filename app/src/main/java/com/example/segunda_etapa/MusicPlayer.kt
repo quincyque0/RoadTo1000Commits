@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.ScaleGestureDetectorCompat
 
 
 class MusicPlayer : AppCompatActivity() {
@@ -50,6 +51,7 @@ class MusicPlayer : AppCompatActivity() {
     private lateinit var Exit: ImageButton
     private lateinit var Upload: ImageButton
     private lateinit var mediaMetadataRetriever: MediaMetadataRetriever
+    private lateinit var Sound: SeekBar
 
 
 
@@ -67,6 +69,7 @@ class MusicPlayer : AppCompatActivity() {
         MusicImage = findViewById(R.id.MusicIMG)
         Exit = findViewById(R.id.Exit)
         Upload = findViewById(R.id.upload)
+        Sound = findViewById(R.id.soundSeekBar)
     }
 
 
@@ -134,10 +137,23 @@ class MusicPlayer : AppCompatActivity() {
             if (isPlaying) {
                 pauseMusic()
             } else {
-                playMusic()
+                mediaPlayer.start()
+                isPlaying = true
+                PlayPause.setImageResource(R.drawable.ic_stop)
             }
         }
+        Exit.setOnClickListener {
+            super.onDestroy()
+            if (mediaPlayer.isPlaying) {
+                mediaPlayer.stop()
+            }
+            mediaPlayer.release()
+            mediaMetadataRetriever.release()
+            finish()
 
+
+
+        }
         Previous.setOnClickListener {
             backSong()
         }
@@ -167,6 +183,17 @@ class MusicPlayer : AppCompatActivity() {
                 }
             }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+        Sound.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean){
+                if(fromUser){
+                    val cur = progress.toFloat()/100
+                    mediaPlayer.setVolume(cur,cur)
+                }
+            }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -210,7 +237,7 @@ class MusicPlayer : AppCompatActivity() {
             mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
                 ?: "Unknown Title"
         var author =
-            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR)
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
                 ?: "Unknown Author"
         var artBit = mediaMetadataRetriever.embeddedPicture
 
@@ -241,7 +268,7 @@ class MusicPlayer : AppCompatActivity() {
 
     private fun playMusic() {
         if(isPlaying == false && playlist.size != 0){
-            if (mediaPlayer.currentPosition == 0 || !mediaPlayer.isPlaying) {
+            if (mediaPlayer.currentPosition == 0 ) {
                 play(playlist[currentSongIndex])
             } else {
                 mediaPlayer.start()
@@ -249,10 +276,11 @@ class MusicPlayer : AppCompatActivity() {
         }
     }
 
+
     private fun pauseMusic() {
         if(isPlaying == true)
         {
-            mediaPlayer.stop()
+            mediaPlayer.pause()
             PlayPause.setImageResource(R.drawable.ic_play)
             isPlaying = false
         }
@@ -336,5 +364,13 @@ class MusicPlayer : AppCompatActivity() {
             Repeat.setImageResource(R.drawable.ic_repeat)
 
     }
+    override fun onPause() {
+        super.onPause()
+
+        if (isPlaying) {
+            pauseMusic()
+        }
+    }
+
 
 }

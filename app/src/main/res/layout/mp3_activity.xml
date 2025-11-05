@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="95dp"
+            android:layout_marginStart="85dp"
             android:layout_marginTop="200dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="20dp"
@@ -42,16 +42,17 @@
 
         <ImageButton
             android:id="@+id/BackMusic"
-            android:rotation="180"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
             android:layout_marginTop="200dp"
-            android:layout_marginEnd="95dp"
+            android:layout_marginEnd="85dp"
             android:layout_marginBottom="20dp"
             android:background="@null"
+            android:rotation="180"
             app:srcCompat="@drawable/ic_next" />
+
         <ImageButton
             android:id="@+id/LikeMusic"
             android:layout_width="wrap_content"
@@ -59,16 +60,17 @@
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
             android:layout_marginTop="200dp"
-            android:layout_marginEnd="170dp"
+            android:layout_marginEnd="145dp"
             android:layout_marginBottom="20dp"
             android:background="@null"
             app:srcCompat="@drawable/ic_heart_like" />
+
         <ImageButton
             android:id="@+id/RepeatMusic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="170dp"
+            android:layout_marginStart="145dp"
             android:layout_marginTop="200dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="20dp"
@@ -183,14 +185,23 @@
             <ImageButton
                 android:background="@null"
                 android:id="@+id/Exit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="400dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="160dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="100dp"
                 app:srcCompat="@drawable/back_icon" />
+
+            <SeekBar
+                android:id="@+id/soundSeekBar"
+                android:rotation="-90"
+                android:layout_width="325dp"
+                android:layout_height="60dp"
+                android:progressDrawable="@drawable/seekbar"
+                android:thumb="@drawable/seekbar_thumb"
+                android:layout_margin="160dp"
+                android:minHeight="8dp"
+                android:maxHeight="8dp"
+                android:max="100"
+                android:progress="100"/>
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="70dp"
@@ -199,13 +210,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:srcCompat="@drawable/ic_heart"/>
 
-            <ImageButton
-                android:id="@+id/imageButton2"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_margin="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/book" />
 
             <ImageButton
                 android:id="@+id/upload"

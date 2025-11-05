@@ -19,22 +19,7 @@
         app:srcCompat="@drawable/clacimage" />
 
 
-    <ImageButton
 
-        android:id="@+id/ButtonGotoTest"
-        android:layout_width="92dp"
-        android:layout_height="91dp"
-        android:adjustViewBounds="false"
-        android:background="@null"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.25"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.396"
-        app:srcCompat="@drawable/clacimage"
-        tools:visibility="invisible" />
 
     <ImageButton
         android:id="@+id/ButtonGoToMP"

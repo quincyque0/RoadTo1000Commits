@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         calcIntent = Intent(this, CalcActivity::class.java)
         MPIntent = Intent(this, MusicPlayer::class.java)
-        Test = Intent(this, testActivity::class.java)
+
 
         setupButtons()
     }
@@ -31,8 +31,5 @@ class MainActivity : AppCompatActivity() {
     private fun setupButtons() {
         findViewById<ImageButton>(R.id.ButtonGoToMP).setOnClickListener { startActivity(MPIntent) }
         findViewById<ImageButton>(R.id.ButtonGotoCalc).setOnClickListener { startActivity(calcIntent) }
-        findViewById<ImageButton>(R.id.ButtonGotoTest).setOnClickListener { startActivity(Test) }
-
-
     }
 }
