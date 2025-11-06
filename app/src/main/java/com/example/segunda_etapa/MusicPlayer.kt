@@ -241,10 +241,15 @@ class MusicPlayer : AppCompatActivity() {
                 ?: "Unknown Author"
         var artBit = mediaMetadataRetriever.embeddedPicture
 
-        val art : Bitmap? = if (artBit != null) {
-            BitmapFactory.decodeByteArray(artBit, 0, artBit.size)
-        } else null;
-        return Song(title, author, art, uri, false)
+        val albumArtBitmap = mediaMetadataRetriever.embeddedPicture?.let {
+            android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size)
+        }
+
+
+
+
+
+        return Song(title, author, albumArtBitmap, uri, false)
 
 
     }
@@ -265,17 +270,6 @@ class MusicPlayer : AppCompatActivity() {
         mediaPlayer.release()
         mediaMetadataRetriever.release()
     }
-
-    private fun playMusic() {
-        if(isPlaying == false && playlist.size != 0){
-            if (mediaPlayer.currentPosition == 0 ) {
-                play(playlist[currentSongIndex])
-            } else {
-                mediaPlayer.start()
-            }
-        }
-    }
-
 
     private fun pauseMusic() {
         if(isPlaying == true)
@@ -333,27 +327,30 @@ class MusicPlayer : AppCompatActivity() {
         updateAllIncurrent()
 
     }
-    private fun updateImage(id: Int){
-        if(playlist[id].bitmap!= null){
-            MusicImage.setImageResource(playlist[id].bitmap as Int)
-        }
-    }
+
     private fun updateSongInfo(song: Song) {
-        SongTitle.text = song.title
-        Artist.text = song.artist
-        if (song.bitmap != null) {
-            MusicImage.setImageBitmap(song.bitmap)
-        } else {
-            MusicImage.setImageResource(R.drawable.no_img)
+        try {
+
+            SongTitle.text = song.title
+            Artist.text = song.artist
+            if (song.bitmap != null) {
+                MusicImage.setImageBitmap(song.bitmap)
+            } else {
+                MusicImage.setImageResource(R.drawable.no_img)
+            }
+
+            MaxTime.text = TimeToText(mediaPlayer.duration)
+            seekBar.max = mediaPlayer.duration
+
+            updateAllIncurrent()
         }
-
-        MaxTime.text = TimeToText(mediaPlayer.duration)
-        seekBar.max = mediaPlayer.duration
-
-        updateAllIncurrent()
+        catch (e: Exception)
+        {
+            Toast.makeText(this,e.toString(), Toast.LENGTH_SHORT)
+        }
     }
     private fun updateAllIncurrent(){
-        updateImage(currentSongIndex)
+
         if (playlist[currentSongIndex].licked)
             updateIcon(R.drawable.ic_heart)
         else
