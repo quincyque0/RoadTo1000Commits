@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <group>
+        <path
+            android:fillColor="?attr/colorOnSecondary"
+            android:pathData="M20.45,7.83h-2.8v2.81a0.5,0.5,0,0,1-1,0V7.83H13.84a0.5,0.5,0,0,1,0-1h2.81V4.02a0.5,0.5,0,0,1,1,0V6.83h2.8A0.5,0.5,0,0,1,20.45,7.83z" />
+        <path
+            android:fillColor="?attr/colorOnSecondary"
+            android:pathData="M3.545,7.83a0.5,0.5,0,0,1,0-1h6.619a0.5,0.5,0,0,1,0,1z" />
+
+        <group>
+            <path
+                android:fillColor="?attr/colorOnSecondary"
+                android:pathData="M13.836,16.05a0.5,0.5,0,0,1,0-1h6.619a0.5,0.5,0,0,1,0,1z" />
+            <path
+                android:fillColor="?attr/colorOnSecondary"
+                android:pathData="M13.836,20.191a0.5,0.5,0,0,1,0-1h6.619a0.5,0.5,0,0,1,0,1z" />
+        </group>
+
+        <path
+            android:fillColor="?attr/colorOnSecondary"
+            android:pathData="M9.55,19.61a0.5,0.5,0,0,1-0.71,0.7L6.86,18.33c-0.66,0.65-1.33,1.32-1.99,1.98a0.5,0.5,0,0,1-0.71-0.7l1.99-1.99L4.16,15.63a0.5,0.5,0,0,1,0.71-0.7l0.58,0.58,1.4,1.4c0.67-0.66,1.33-1.32,1.99-1.98a0.5,0.5,0,0,1,0.71,0.7L7.56,17.62z" />
+    </group>
+</vector>

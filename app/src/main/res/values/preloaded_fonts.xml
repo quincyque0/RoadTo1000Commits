@@ -3,5 +3,7 @@
     <array name="preloaded_fonts" translatable="false">
         <item>@font/b612_mono</item>
         <item>@font/inter_thin</item>
+        <item>@font/lemon</item>
+        <item>@font/lemonada_light</item>
     </array>
 </resources>
