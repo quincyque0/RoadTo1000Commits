@@ -2,6 +2,7 @@ package com.example.segunda_etapa
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.media.Image
 import android.os.Bundle
 
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var calcIntent: Intent
     private lateinit var MPIntent: Intent
+    private lateinit var Location: Intent
     private lateinit var Test: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         calcIntent = Intent(this, CalcActivity::class.java)
         MPIntent = Intent(this, MusicPlayer::class.java)
+        Location = Intent(this, LocationActivity::class.java)
 
 
         setupButtons()
@@ -31,5 +34,6 @@ class MainActivity : AppCompatActivity() {
     private fun setupButtons() {
         findViewById<ImageButton>(R.id.ButtonGoToMP).setOnClickListener { startActivity(MPIntent) }
         findViewById<ImageButton>(R.id.ButtonGotoCalc).setOnClickListener { startActivity(calcIntent) }
+        findViewById<ImageButton>(R.id.ButtonGoToLocation).setOnClickListener{ startActivity(Location) }
     }
 }
