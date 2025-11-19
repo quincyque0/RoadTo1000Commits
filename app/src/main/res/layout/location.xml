@@ -1,6 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/Latitude"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:fontFamily="@font/lemonada_light"
+        android:text="Latitude: "
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id="@+id/Longitude"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:fontFamily="@font/lemonada_light"
+        android:text="Longitude: "
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Latitude"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/Altitude"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:fontFamily="@font/lemonada_light"
+        android:text="Altitude: "
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Longitude"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/CurTime"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:fontFamily="@font/lemonada_light"
+        android:text="Time: "
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Altitude"
+        android:layout_marginTop="20dp" />
+
+    <Button
+        android:id="@+id/curLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#121212"
+        android:text="Get Position"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CurTime"
+        android:layout_marginTop="40dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
