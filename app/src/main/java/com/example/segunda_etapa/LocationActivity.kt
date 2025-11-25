@@ -1,6 +1,7 @@
 package com.example.segunda_etapa
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.Location
@@ -15,14 +16,20 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import android.location.LocationListener
 import com.google.android.gms.tasks.CancellationTokenSource
+import java.io.File
+import java.io.FileWriter
 
-class LocationActivity : AppCompatActivity() {
+class LocationActivity :AppCompatActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var longitudeText: TextView
     private lateinit var latitudeText: TextView
     private lateinit var altitudeText: TextView
+    private lateinit var timeText: TextView
     private lateinit var getCurrentLocationBtn: Button
+    private lateinit var getBackgroundLocationBtn: Button
+    var intentServ = Intent(this, LocationService::class.java)
 
     private val locationPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -53,13 +60,6 @@ class LocationActivity : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         initUI()
-    }
-
-    private fun initUI() {
-        longitudeText = findViewById(R.id.Longitude)
-        latitudeText = findViewById(R.id.Latitude)
-        altitudeText = findViewById(R.id.Altitude)
-        getCurrentLocationBtn = findViewById(R.id.curLoc)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -68,6 +68,20 @@ class LocationActivity : AppCompatActivity() {
         getCurrentLocationBtn.setOnClickListener {
             getCurrentLocation()
         }
+        getBackgroundLocationBtn.setOnClickListener {
+            startService(intentServ)
+        }
+    }
+
+    private fun initUI() {
+        longitudeText = findViewById(R.id.Longitude)
+        latitudeText = findViewById(R.id.Latitude)
+        altitudeText = findViewById(R.id.Altitude)
+        timeText = findViewById(R.id.CurTime)
+        getCurrentLocationBtn = findViewById(R.id.curLoc)
+        getBackgroundLocationBtn = findViewById(R.id.backLoc)
+
+
     }
 
 
@@ -85,7 +99,7 @@ class LocationActivity : AppCompatActivity() {
             }
     }
 
-    private fun getCurrentLocation() {
+    private fun getCurrentLocation(){
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -94,27 +108,31 @@ class LocationActivity : AppCompatActivity() {
             permissionRequest.launch(locationPermissions)
             return
         }
-
-        val priority = Priority.PRIORITY_HIGH_ACCURACY
         fusedLocationProviderClient.getCurrentLocation(
-            priority,
+            Priority.PRIORITY_HIGH_ACCURACY,
             CancellationTokenSource().token
         )
+
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     updateLocationUI(location)
                 } else {
-                    Toast.makeText(this, "Не получилось получить локацию", Toast.LENGTH_SHORT).show()
+                    getLastLocation()
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, " ${e.message}", Toast.LENGTH_SHORT).show()
             }
+
     }
+
+
+
 
     private fun updateLocationUI(location: Location) {
         latitudeText.text = "Latitude: ${location.latitude}"
         longitudeText.text = "Longitude: ${location.longitude}"
         altitudeText.text = "Altitude: ${location.altitude}"
+        timeText.text = "Time: ${location.time}"
     }
 }
