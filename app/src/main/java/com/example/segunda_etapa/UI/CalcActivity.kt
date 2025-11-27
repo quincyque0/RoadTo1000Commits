@@ -1,4 +1,4 @@
-package com.example.segunda_etapa
+package com.example.segunda_etapa.UI
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import com.example.segunda_etapa.R
 
 class StringHandler {
     private var stroke: String = ""

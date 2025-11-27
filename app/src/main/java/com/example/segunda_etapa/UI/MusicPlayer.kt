@@ -1,25 +1,30 @@
-package com.example.segunda_etapa
+package com.example.segunda_etapa.UI
 
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import android.media.MediaPlayer
-import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.ScaleGestureDetectorCompat
+import com.example.segunda_etapa.R
+import com.example.segunda_etapa.`class`.Song
+
 
 
 class MusicPlayer : AppCompatActivity() {
@@ -96,12 +101,14 @@ class MusicPlayer : AppCompatActivity() {
 
 
 
-        gestureDet = GestureDetectorCompat(this, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onFling(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                velocityX: Float,
-                velocityY: Float): Boolean {
+        gestureDet =
+            GestureDetectorCompat(this, object : GestureDetector.SimpleOnGestureListener() {
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
                     if (e1 == null) return false
 
                     val diffX = e2.x - e1.x
@@ -122,7 +129,7 @@ class MusicPlayer : AppCompatActivity() {
 
 
 
-            findViewById<android.view.View>(R.id.main_content).setOnTouchListener(
+            findViewById<View>(R.id.main_content).setOnTouchListener(
                 object : View.OnTouchListener {
                     override fun onTouch(v: View?, event: MotionEvent): Boolean {
                         return gestureDet.onTouchEvent(event)
@@ -188,7 +195,7 @@ class MusicPlayer : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
         Sound.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?,progress: Int,fromUser: Boolean){
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean){
                 if(fromUser){
                     val cur = progress.toFloat()/100
                     mediaPlayer.setVolume(cur,cur)
@@ -230,7 +237,7 @@ class MusicPlayer : AppCompatActivity() {
 
 
     }
-    private fun getMusicInfo(context: Context,uri: Uri?) : Song{
+    private fun getMusicInfo(context: Context, uri: Uri?) : Song {
 
         mediaMetadataRetriever.setDataSource(context, uri)
         var title =
@@ -242,7 +249,7 @@ class MusicPlayer : AppCompatActivity() {
         var artBit = mediaMetadataRetriever.embeddedPicture
 
         val albumArtBitmap = mediaMetadataRetriever.embeddedPicture?.let {
-            android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size)
+            BitmapFactory.decodeByteArray(it, 0, it.size)
         }
 
 
