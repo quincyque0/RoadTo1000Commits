@@ -1,4 +1,4 @@
-package com.example.segunda_etapa
+package com.example.segunda_etapa.Services
 
 import android.Manifest
 import android.app.Notification
@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.example.segunda_etapa.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -22,6 +23,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import org.json.JSONObject
+import com.example.segunda_etapa.Supp.saveJSON
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -59,26 +61,7 @@ class LocationService : Service() {
             Log.d("LocationService", "Сервис запущен")
         }
 
-        fun saveJSON(filename: String, data: JSONObject, context: Context): Boolean {
-            return try {
-                val documentsDir = File(context.getExternalFilesDir(null), "Documents")
-                if (!documentsDir.exists()) {
-                    documentsDir.mkdirs()
-                    Log.d("LocationService", "Создана папка: ${documentsDir.absolutePath}")
-                }
 
-                val file = File(documentsDir, "$filename.txt")
-                FileWriter(file, true).use { writer ->
-                    writer.write(data.toString() + "\n")
-                }
-
-                Log.d("LocationService", "Локация сохранена в: ${file.absolutePath}")
-                true
-            } catch (e: IOException) {
-                Log.e("LocationService", "Ошибка сохранения: ${e.message}")
-                false
-            }
-        }
     }
 
     override fun onCreate() {
@@ -176,7 +159,7 @@ class LocationService : Service() {
                 description = "для оповещений"
             }
 
-            val notificationManager = getSystemService(NotificationManager::class.java)
+            val notificationManager = this.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
     }

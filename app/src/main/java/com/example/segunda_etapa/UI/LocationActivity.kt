@@ -1,23 +1,27 @@
-package com.example.segunda_etapa
+package com.example.segunda_etapa.UI
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.segunda_etapa.R
+import com.example.segunda_etapa.Services.LocationService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import android.net.Uri
-import android.util.Log
 import com.google.android.gms.tasks.CancellationTokenSource
 import java.io.File
 
@@ -30,7 +34,8 @@ class LocationActivity : AppCompatActivity() {
     private lateinit var getCurrentLocationBtn: Button
     private lateinit var getBackgroundLocationBtn: Button
 
-    private var folderUri: Uri? = null
+
+    private var serviseActive: Boolean = false;
 
     private val locationPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -75,13 +80,14 @@ class LocationActivity : AppCompatActivity() {
         initUI()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        getCurrentLocationBtn.setOnClickListener {
+        getCurrentLocationBtn.setOnClickListener @androidx.annotation.RequiresPermission(allOf = [android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION]) {
             getCurrentLocation()
         }
 
         getBackgroundLocationBtn.setOnClickListener {
-            startBackgroundLocationService()
+            changeButtonVis()
         }
+
     }
 
     private fun initUI() {
@@ -93,6 +99,7 @@ class LocationActivity : AppCompatActivity() {
         getBackgroundLocationBtn = findViewById(R.id.backLoc)
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun getLastLocation() {
         if (!locationPermission()) {
             permissionRequest.launch(locationPermissions)
@@ -111,6 +118,7 @@ class LocationActivity : AppCompatActivity() {
             }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun getCurrentLocation() {
         if (!locationPermission()) {
             permissionRequest.launch(locationPermissions)
@@ -141,13 +149,13 @@ class LocationActivity : AppCompatActivity() {
         }
 
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q &&
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
             !backgroundLocationPermission()) {
             backgroundPermissionRequest.launch(backgroundLocationPermission)
             return
         }
 
-        LocationService.startService(this)
+        LocationService.Companion.startService(this)
         Toast.makeText(this, "Фоновый сервис запущен", Toast.LENGTH_SHORT).show()
 
         showSavePath()
@@ -172,7 +180,7 @@ class LocationActivity : AppCompatActivity() {
     }
 
     private fun backgroundLocationPermission(): Boolean {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
@@ -194,4 +202,16 @@ class LocationActivity : AppCompatActivity() {
         stopService(intent)
         Toast.makeText(this, "Сервис остановлен", Toast.LENGTH_SHORT).show()
     }
+    private fun changeButtonVis(){
+        if(serviseActive == false){
+            startBackgroundLocationService()
+            getBackgroundLocationBtn.text = "Выкоючить отслеживание"
+            serviseActive = true;
+        }else{
+            stopBackgroundLocationService()
+            getBackgroundLocationBtn.text = "Включить отслеживание"
+            serviseActive = false;
+        }
+    }
+
 }

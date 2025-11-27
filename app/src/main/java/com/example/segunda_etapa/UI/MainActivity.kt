@@ -1,13 +1,14 @@
-package com.example.segunda_etapa
+package com.example.segunda_etapa.UI
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.media.Image
 import android.os.Bundle
-
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.ImageButton
+import com.example.segunda_etapa.UI.LocationActivity
+import com.example.segunda_etapa.R
+import com.example.segunda_etapa.UI.MusicPlayer
 
 class MainActivity : AppCompatActivity() {
 

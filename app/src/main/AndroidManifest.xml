@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Segunda_Etapa">
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,19 +27,19 @@
             </intent-filter>
         </activity>
         <service
-            android:name="LocationService"
+            android:name=".Services.LocationService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
         <activity
-            android:name=".CalcActivity"
+            android:name=".UI.CalcActivity"
             android:exported="false"/>
 
         <activity
-            android:name=".MusicPlayer"
+            android:name=".UI.MusicPlayer"
             android:exported="false"/>
         <activity
-            android:name=".LocationActivity"
+            android:name=".UI.LocationActivity"
             android:exported="false"/>
 
         <meta-data
