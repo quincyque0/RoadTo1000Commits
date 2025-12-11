@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var MPIntent: Intent
     private lateinit var Location: Intent
     private lateinit var Telephony: Intent
+    private lateinit var Server: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         MPIntent = Intent(this, MusicPlayer::class.java)
         Location = Intent(this, LocationActivity::class.java)
         Telephony = Intent(this, TelephonyActivity::class.java)
+        Server = Intent(this, DataSendActivity::class.java)
 
 
         setupButtons()
@@ -38,5 +40,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.ButtonGotoCalc).setOnClickListener { startActivity(calcIntent) }
         findViewById<ImageButton>(R.id.ButtonGoToLocation).setOnClickListener{ startActivity(Location) }
         findViewById<ImageButton>(R.id.ButtonGoToTelephony).setOnClickListener{ startActivity(Telephony) }
+        findViewById<ImageButton>(R.id.ButtonGoToServercontact).setOnClickListener{ startActivity(Server) }
     }
 }

@@ -46,7 +46,9 @@
         <activity
             android:name=".UI.TelephonyActivity"
             android:exported="false"/>
-
+        <activity
+            android:name=".UI.DataSendActivity"
+            android:exported="false"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
