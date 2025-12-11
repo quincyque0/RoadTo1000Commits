@@ -40,6 +40,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.ButtonGotoCalc).setOnClickListener { startActivity(calcIntent) }
         findViewById<ImageButton>(R.id.ButtonGoToLocation).setOnClickListener{ startActivity(Location) }
         findViewById<ImageButton>(R.id.ButtonGoToTelephony).setOnClickListener{ startActivity(Telephony) }
-        findViewById<ImageButton>(R.id.ButtonGoToServercontact).setOnClickListener{ startActivity(Server) }
+        findViewById<ImageButton>(R.id.ButtonGoToServer).setOnClickListener{ startActivity(Server) }
     }
 }
