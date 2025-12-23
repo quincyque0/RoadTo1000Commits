@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
 
@@ -41,7 +44,12 @@
         <activity
             android:name=".UI.LocationActivity"
             android:exported="false"/>
-
+        <activity
+            android:name=".UI.TelephonyActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".UI.DataSendActivity"
+            android:exported="false"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
