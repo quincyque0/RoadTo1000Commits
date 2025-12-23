@@ -10,6 +10,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +22,7 @@ class TelephonyActivity : AppCompatActivity() {
 
     lateinit var telephonyManager: TelephonyManager
     lateinit var locate: Button
-
+    lateinit var textView: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,6 +30,7 @@ class TelephonyActivity : AppCompatActivity() {
         getSupportActionBar()?.hide()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         locate = findViewById(R.id.locate)
+        textView = findViewById(R.id.info)
         initUI()
 
     }
@@ -59,7 +61,9 @@ class TelephonyActivity : AppCompatActivity() {
     fun getDatas(){
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val cellInfoList = telephonyManager.allCellInfo
+        textView.setText("${cellInfoList.toString()}")
         Log.d(TAG, "${cellInfoList.toString()}")
+
     }
     private fun initUI() {
         locate.setOnClickListener @androidx.annotation.RequiresPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) { getDatas() }

@@ -7,56 +7,16 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/Latitude"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:id="@+id/info"
+        android:layout_width="367dp"
+        android:layout_height="629dp"
         android:fontFamily="@font/lemonada_light"
-        android:text="Latitude: "
+        android:text=""
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="30dp" />
-
-    <TextView
-        android:id="@+id/Longitude"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:fontFamily="@font/lemonada_light"
-        android:text="Longitude: "
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Latitude"
-        android:layout_marginTop="20dp" />
-
-    <TextView
-        android:id="@+id/Altitude"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:fontFamily="@font/lemonada_light"
-        android:text="Altitude: "
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Longitude"
-        android:layout_marginTop="20dp" />
-
-    <TextView
-        android:id="@+id/CurTime"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:fontFamily="@font/lemonada_light"
-        android:text="Time: "
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Altitude"
-        android:layout_marginTop="20dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/locate"
@@ -65,11 +25,9 @@
         android:backgroundTint="?colorOnSecondary"
         android:text="Измерить"
         android:textColor="?colorOnPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CurTime"
-        android:layout_marginTop="40dp" />
-
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
