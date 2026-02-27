@@ -62,6 +62,7 @@ class TelephonyActivity : AppCompatActivity() {
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val cellInfoList = telephonyManager.allCellInfo
         textView.setText("${cellInfoList.toString()}")
+
         Log.d(TAG, "${cellInfoList.toString()}")
 
     }
