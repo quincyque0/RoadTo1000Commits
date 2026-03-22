@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.segunda_etapa.UI.LocationActivity
 import com.example.segunda_etapa.R
+import com.example.segunda_etapa.UI.DataSendActivity
 import com.example.segunda_etapa.UI.MusicPlayer
 
 class MainActivity : AppCompatActivity() {

@@ -7,24 +7,31 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import android.util.Log
 import android.widget.ImageButton
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.segunda_etapa.R
+import com.example.segunda_etapa.Services.BackgroundDataSendService
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import org.json.JSONObject
 import org.zeromq.SocketType
+import android.widget.EditText
 import org.zeromq.ZContext
 import org.zeromq.ZMQ
 
 class DataSendActivity : AppCompatActivity() {
+    private lateinit var serverAddressInput: EditText
+    private lateinit var serverPortInput: EditText
+    private lateinit var btnApplyServer: Button
+    private lateinit var btnTestConnection: Button
+    private lateinit var connectionStatus: TextView
     private lateinit var sendButton: ImageButton
     private lateinit var latitudeText: TextView
     private lateinit var longitudeText: TextView
@@ -82,7 +89,7 @@ class DataSendActivity : AppCompatActivity() {
         supportActionBar?.hide()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        serverAddress = "10.103.13.180"
+        serverAddress = "10.44.78.180"
         serverPort = "5555"
 
         initializeUI()
@@ -94,6 +101,21 @@ class DataSendActivity : AppCompatActivity() {
     }
 
     private fun initializeUI() {
+        serverAddressInput = findViewById(R.id.server_address_input)
+        serverPortInput = findViewById(R.id.server_port_input)
+        btnApplyServer = findViewById(R.id.btn_apply_server)
+        btnTestConnection = findViewById(R.id.btn_test_connection)
+        connectionStatus = findViewById(R.id.connection_status)
+
+        serverAddressInput.setText(serverAddress)
+        serverPortInput.setText(serverPort)
+
+        val btnUpdateLocation = findViewById<Button>(R.id.btn_update_location)
+        val btnGetCellInfo = findViewById<Button>(R.id.btn_get_cellinfo)
+        val btnStartService = findViewById<Button>(R.id.btn_start_service)
+        val btnStopService = findViewById<Button>(R.id.btn_stop_service)
+        val cellInfoText = findViewById<TextView>(R.id.cellinfo_text)
+
         sendButton = findViewById(R.id.datasent)
         latitudeText = findViewById(R.id.latitude_value)
         longitudeText = findViewById(R.id.longitude_value)
@@ -101,6 +123,44 @@ class DataSendActivity : AppCompatActivity() {
         timestampText = findViewById(R.id.timestamp_value)
         imeiText = findViewById(R.id.imei_value)
         statusText = findViewById(R.id.status_text)
+
+        btnUpdateLocation.setOnClickListener {
+            getCurrentLocation()
+            Toast.makeText(this, "Обновление GPS", Toast.LENGTH_SHORT).show()
+        }
+
+        btnGetCellInfo.setOnClickListener {
+            getCellInfo()
+            cellInfoText.text = "Информация о сотах:\n$cellInfoString"
+            Toast.makeText(this, "Информация о вышках обновлена", Toast.LENGTH_SHORT).show()
+        }
+
+        btnStartService.setOnClickListener {
+            BackgroundDataSendService.startService(this)
+            Toast.makeText(this, "Фоновый сервис запущен", Toast.LENGTH_SHORT).show()
+        }
+
+        btnStopService.setOnClickListener {
+            BackgroundDataSendService.stopService(this)
+            Toast.makeText(this, "Фоновый сервис остановлен", Toast.LENGTH_SHORT).show()
+        }
+
+        btnApplyServer.setOnClickListener {
+            val newAddress = serverAddressInput.text.toString().trim()
+            val newPort = serverPortInput.text.toString().trim()
+
+            if (newAddress.isNotEmpty() && newPort.isNotEmpty()) {
+                serverAddress = newAddress
+                serverPort = newPort
+                Toast.makeText(this, "Адрес сервера обновлен: $serverAddress:$serverPort", Toast.LENGTH_SHORT).show()
+                updateStatus("Сервер: $serverAddress:$serverPort")
+                connectionStatus.text =  "Адрес обновлен"
+                connectionStatus.setTextColor(android.graphics.Color.GREEN)
+            } else {
+                Toast.makeText(this, "Введите адрес и порт", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
         sendButton.setOnClickListener {
             if (isLocationReady) {
