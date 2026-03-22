@@ -18,6 +18,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/edit_text_border"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Режим отправки:"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Телефон"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_send_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Сервер"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginBottom="16dp"
         android:background="@drawable/edit_text_border"
         android:padding="8dp">
@@ -65,121 +110,8 @@
             android:gravity="center"/>
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Текущие координаты:"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="4dp">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Широта:"/>
-
-        <TextView
-            android:id="@+id/latitude_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="--"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Долгота:"/>
-
-        <TextView
-            android:id="@+id/longitude_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="--"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Высота:"/>
-
-        <TextView
-            android:id="@+id/altitude_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="--"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Время:"/>
-
-        <TextView
-            android:id="@+id/timestamp_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="--"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="IMEI:"/>
-
-        <TextView
-            android:id="@+id/imei_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="--"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#666"
-        android:layout_marginVertical="16dp"/>
 
     <TextView
         android:id="@+id/status_text"
@@ -189,19 +121,29 @@
         android:textSize="14sp"
         android:padding="8dp"
         android:background="#f0f0f0"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/records_count_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Записей в файле: 0"
+        android:textSize="12sp"
+        android:padding="4dp"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"/>
 
     <ImageButton
         android:id="@+id/datasent"
         android:layout_width="225dp"
-        android:layout_height="225dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Отправить данные"
-        android:src="@drawable/ic_server"
-        android:scaleType="centerInside"
         android:padding="20dp"
-        android:layout_marginBottom="16dp"/>
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_server" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -284,26 +226,22 @@
             android:textColor="#000000" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/cellinfo_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Информация о сотах: --"
-        android:textSize="12sp"
-        android:padding="8dp"
-        android:background="#e0e0e0"
-        android:layout_marginTop="16dp"
-        android:maxLines="3"
-        android:ellipsize="end"/>
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
 
-    <TextView
-        android:id="@+id/connection_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="12sp"
-        android:padding="4dp"
-        android:layout_marginTop="4dp"
-        android:gravity="center"/>
+        <Button
+            android:id="@+id/btn_clear_data"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Очистить данные"
+            android:backgroundTint="#d7d7d7"
+            android:textColor="#000000" />
+    </LinearLayout>
+
 
 </LinearLayout>

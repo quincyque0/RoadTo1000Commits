@@ -12,10 +12,14 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.segunda_etapa.R
 import com.example.segunda_etapa.Services.BackgroundDataSendService
+import com.example.segunda_etapa.Supp.saveJSON
+import com.example.segunda_etapa.Supp.readAllJSON
+import com.example.segunda_etapa.Supp.clearJSON
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -25,20 +29,20 @@ import org.zeromq.SocketType
 import android.widget.EditText
 import org.zeromq.ZContext
 import org.zeromq.ZMQ
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DataSendActivity : AppCompatActivity() {
     private lateinit var serverAddressInput: EditText
     private lateinit var serverPortInput: EditText
     private lateinit var btnApplyServer: Button
     private lateinit var btnTestConnection: Button
-    private lateinit var connectionStatus: TextView
     private lateinit var sendButton: ImageButton
-    private lateinit var latitudeText: TextView
-    private lateinit var longitudeText: TextView
-    private lateinit var altitudeText: TextView
-    private lateinit var timestampText: TextView
-    private lateinit var imeiText: TextView
     private lateinit var statusText: TextView
+    private lateinit var switchSendMode: SwitchCompat
+    private lateinit var btnClearData: Button
+    private lateinit var recordsCountText: TextView
 
     private lateinit var serverAddress: String
     private lateinit var serverPort: String
@@ -76,6 +80,7 @@ class DataSendActivity : AppCompatActivity() {
             initializeLocation()
             getDeviceImei()
             getCellInfo()
+            updateRecordsCount()
         } else {
             Toast.makeText(this, "Необходимы разрешения", Toast.LENGTH_LONG).show()
             updateStatus("Ошибка: нет разрешений")
@@ -105,7 +110,9 @@ class DataSendActivity : AppCompatActivity() {
         serverPortInput = findViewById(R.id.server_port_input)
         btnApplyServer = findViewById(R.id.btn_apply_server)
         btnTestConnection = findViewById(R.id.btn_test_connection)
-        connectionStatus = findViewById(R.id.connection_status)
+        switchSendMode = findViewById(R.id.switch_send_mode)
+        btnClearData = findViewById(R.id.btn_clear_data)
+        recordsCountText = findViewById(R.id.records_count_text)
 
         serverAddressInput.setText(serverAddress)
         serverPortInput.setText(serverPort)
@@ -114,15 +121,27 @@ class DataSendActivity : AppCompatActivity() {
         val btnGetCellInfo = findViewById<Button>(R.id.btn_get_cellinfo)
         val btnStartService = findViewById<Button>(R.id.btn_start_service)
         val btnStopService = findViewById<Button>(R.id.btn_stop_service)
-        val cellInfoText = findViewById<TextView>(R.id.cellinfo_text)
 
         sendButton = findViewById(R.id.datasent)
-        latitudeText = findViewById(R.id.latitude_value)
-        longitudeText = findViewById(R.id.longitude_value)
-        altitudeText = findViewById(R.id.altitude_value)
-        timestampText = findViewById(R.id.timestamp_value)
-        imeiText = findViewById(R.id.imei_value)
         statusText = findViewById(R.id.status_text)
+
+        switchSendMode.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                updateStatus("Режим: отправка на сервер")
+                Toast.makeText(this, "Режим отправки: Сервер", Toast.LENGTH_SHORT).show()
+                BackgroundDataSendService.updateSendMode(this, true)
+            } else {
+                updateStatus("Режим: сохранение на телефоне")
+                Toast.makeText(this, "Режим отправки: Сохранение на телефоне", Toast.LENGTH_SHORT).show()
+                BackgroundDataSendService.updateSendMode(this, false)
+                updateRecordsCount()
+            }
+        }
+
+
+        btnClearData.setOnClickListener {
+            clearLocalData()
+        }
 
         btnUpdateLocation.setOnClickListener {
             getCurrentLocation()
@@ -131,7 +150,6 @@ class DataSendActivity : AppCompatActivity() {
 
         btnGetCellInfo.setOnClickListener {
             getCellInfo()
-            cellInfoText.text = "Информация о сотах:\n$cellInfoString"
             Toast.makeText(this, "Информация о вышках обновлена", Toast.LENGTH_SHORT).show()
         }
 
@@ -154,21 +172,156 @@ class DataSendActivity : AppCompatActivity() {
                 serverPort = newPort
                 Toast.makeText(this, "Адрес сервера обновлен: $serverAddress:$serverPort", Toast.LENGTH_SHORT).show()
                 updateStatus("Сервер: $serverAddress:$serverPort")
-                connectionStatus.text =  "Адрес обновлен"
-                connectionStatus.setTextColor(android.graphics.Color.GREEN)
             } else {
                 Toast.makeText(this, "Введите адрес и порт", Toast.LENGTH_SHORT).show()
             }
         }
 
+        btnTestConnection.setOnClickListener {
+            testServerConnection()
+        }
 
         sendButton.setOnClickListener {
             if (isLocationReady) {
-                sendLocationData()
+                if (switchSendMode.isChecked) {
+                    sendLocationData()
+                } else {
+                    saveLocationToPhone()
+                }
             } else {
                 Toast.makeText(this, "Получение данных GPS", Toast.LENGTH_SHORT).show()
                 updateStatus("Ожидание данных GPS")
                 getCurrentLocation()
+            }
+        }
+    }
+
+    private fun testServerConnection() {
+        updateStatus("Проверка подключения к серверу")
+
+        Thread {
+            val context = ZContext()
+            val socket = context.createSocket(SocketType.REQ)
+
+            try {
+                socket.setReceiveTimeOut(3000)
+                socket.setSendTimeOut(3000)
+                socket.setLinger(0)
+
+                val connectorSocket = "tcp://$serverAddress:$serverPort"
+                socket.connect(connectorSocket)
+
+                val testData = JSONObject().apply {
+                    put("test", "connection")
+                    put("timestamp", System.currentTimeMillis())
+                }
+
+                val request = testData.toString()
+                val sendSuccess = socket.send(request.toByteArray(ZMQ.CHARSET), 0)
+
+                if (sendSuccess) {
+                    val reply = socket.recv(0)
+                    if (reply != null) {
+                        runOnUiThread {
+                            Toast.makeText(this@DataSendActivity,
+                                "Сервер доступен", Toast.LENGTH_SHORT).show()
+                            updateStatus("Сервер доступен")
+                        }
+                    } else {
+                        runOnUiThread {
+                            Toast.makeText(this@DataSendActivity,
+                                "Сервер не отвечает", Toast.LENGTH_SHORT).show()
+                            updateStatus("Сервер не отвечает")
+                        }
+                    }
+                } else {
+                    runOnUiThread {
+                        updateStatus("Ошибка подключения")
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@DataSendActivity,
+                        "Ошибка подключения: ${e.message}", Toast.LENGTH_SHORT).show()
+                    updateStatus("Ошибка подключения")
+                }
+            } finally {
+                socket.close()
+                context.close()
+            }
+        }.start()
+    }
+
+    private fun clearLocalData() {
+        val success = clearJSON(this, "location")
+        if (success) {
+            Toast.makeText(this, "Локальные данные очищены", Toast.LENGTH_SHORT).show()
+            updateRecordsCount()
+            updateStatus("Локальные данные очищены")
+        } else {
+            Toast.makeText(this, "Ошибка очистки данных", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateRecordsCount() {
+        try {
+            val jsonArray = readAllJSON(this, "location")
+            if (jsonArray != null) {
+                val count = jsonArray.length()
+                recordsCountText.text = "Записей в файле: $count"
+            } else {
+                recordsCountText.text = "Записей в файле: 0"
+            }
+        } catch (e: Exception) {
+            recordsCountText.text = "Записей в файле: ошибка"
+        }
+    }
+
+    private fun saveLocationToPhone() {
+        if (isSending) {
+            Toast.makeText(this, "Сохранение уже выполняется", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        getCellInfo()
+        isSending = true
+        updateStatus("Сохранение данных на телефон")
+
+        try {
+            val jsonData = JSONObject().apply {
+                put("latitude", currentLatitude)
+                put("longitude", currentLongitude)
+                put("altitude", currentAltitude)
+                put("timestamp", currentTimestamp)
+                put("imei", deviceImei)
+                put("cellInfo", cellInfoString)
+                put("savedAt", System.currentTimeMillis())
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                put("savedAtFormatted", dateFormat.format(Date()))
+            }
+
+            val success = saveJSON("location", jsonData, this)
+
+            runOnUiThread {
+                if (success) {
+                    Toast.makeText(this,
+                        "Данные сохранены в location.json", Toast.LENGTH_LONG).show()
+                    updateStatus("Данные сохранены в location.json")
+                    updateRecordsCount()
+                } else {
+                    Toast.makeText(this,
+                        "Ошибка сохранения данных", Toast.LENGTH_LONG).show()
+                    updateStatus("Ошибка сохранения")
+                }
+                isSending = false
+            }
+
+        } catch (e: Exception) {
+            runOnUiThread {
+                Toast.makeText(this,
+                    "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
+                updateStatus("Ошибка: ${e.message}")
+                isSending = false
             }
         }
     }
@@ -178,6 +331,7 @@ class DataSendActivity : AppCompatActivity() {
             initializeLocation()
             getDeviceImei()
             getCellInfo()
+            updateRecordsCount()
         } else {
             permissionRequest.launch(phoneStatePermissions)
         }
@@ -251,13 +405,6 @@ class DataSendActivity : AppCompatActivity() {
         currentLongitude = location.longitude
         currentAltitude = location.altitude
         currentTimestamp = location.time
-
-        runOnUiThread {
-            latitudeText.text = String.format("%.6f°", currentLatitude)
-            longitudeText.text = String.format("%.6f°", currentLongitude)
-            altitudeText.text = String.format("%.1f м", currentAltitude)
-            timestampText.text = currentTimestamp.toString()
-        }
     }
 
     private fun getDeviceImei() {
@@ -273,10 +420,6 @@ class DataSendActivity : AppCompatActivity() {
             }
         } catch (e: SecurityException) {
             deviceImei = "No_IMEI_${System.currentTimeMillis()}"
-        }
-
-        runOnUiThread {
-            imeiText.text = deviceImei
         }
     }
 
@@ -321,7 +464,7 @@ class DataSendActivity : AppCompatActivity() {
         getCellInfo()
 
         isSending = true
-        updateStatus("Отправка данных")
+        updateStatus("Отправка данных на сервер")
 
         Thread {
             val context = ZContext()
@@ -392,7 +535,9 @@ class DataSendActivity : AppCompatActivity() {
 
     private fun updateStatus(message: String) {
         runOnUiThread {
-            statusText.text = "Статус: $message"
+            if (::statusText.isInitialized) {
+                statusText.text = "Статус: $message"
+            }
         }
     }
 }

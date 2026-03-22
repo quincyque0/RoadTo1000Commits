@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -17,6 +18,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.segunda_etapa.R
+import com.example.segunda_etapa.Supp.saveJSON
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -28,6 +30,9 @@ import org.json.JSONObject
 import org.zeromq.SocketType
 import org.zeromq.ZContext
 import org.zeromq.ZMQ
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 
@@ -35,6 +40,7 @@ class BackgroundDataSendService : Service() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var telephonyManager: TelephonyManager
     private lateinit var locationRequest: LocationRequest
+    private lateinit var sharedPreferences: SharedPreferences
 
     private var currentLatitude = 0.0
     private var currentLongitude = 0.0
@@ -47,6 +53,7 @@ class BackgroundDataSendService : Service() {
     private var sendTimer: Timer? = null
     private var locationReceived = false
     private var consecutiveFailures = 0
+    private var sendToServer = true
 
     private val serverAddress = "10.44.78.180"
     private val serverPort = "5555"
@@ -56,6 +63,8 @@ class BackgroundDataSendService : Service() {
         const val NOTIFICATION_ID = 2222
         const val CHANNEL_ID = "background_data_send"
         const val TAG = "BackgroundDataSend"
+        const val PREFS_NAME = "background_service_prefs"
+        const val KEY_SEND_TO_SERVER = "send_to_server"
 
         fun startService(context: Context) {
             val intent = Intent(context, BackgroundDataSendService::class.java)
@@ -72,12 +81,21 @@ class BackgroundDataSendService : Service() {
             context.stopService(intent)
             Log.d(TAG, "Команда на остановку сервиса отправлена")
         }
+
+        fun updateSendMode(context: Context, sendToServer: Boolean) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putBoolean(KEY_SEND_TO_SERVER, sendToServer).apply()
+            Log.d(TAG, "Режим отправки обновлен: ${if (sendToServer) "Сервер" else "Телефон"}")
+        }
     }
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
+
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        sendToServer = sharedPreferences.getBoolean(KEY_SEND_TO_SERVER, true)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
@@ -136,7 +154,7 @@ class BackgroundDataSendService : Service() {
                 "Фоновая отправка данных",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Отправка данных о местоположении и сотах на сервер"
+                description = "Отправка данных о местоположении и сотах на сервер или сохранение на телефоне"
             }
 
             val notificationManager = getSystemService(NotificationManager::class.java)
@@ -145,13 +163,28 @@ class BackgroundDataSendService : Service() {
     }
 
     private fun createNotification(): Notification {
+        val modeText = if (sendToServer) "Отправка на сервер" else "Сохранение на телефон"
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Отправка данных")
-            .setContentText("Отправка геоданных на сервер")
+            .setContentText("$modeText | Локация: ${String.format("%.4f, %.4f", currentLatitude, currentLongitude)}")
             .setSmallIcon(R.drawable.ic_location)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()
+    }
+
+    private fun updateNotification() {
+        val modeText = if (sendToServer) "Отправка на сервер" else "Сохранение на телефон"
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Отправка данных")
+            .setContentText("$modeText | Локация: ${String.format("%.4f, %.4f", currentLatitude, currentLongitude)}")
+            .setSmallIcon(R.drawable.ic_location)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .build()
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     private fun startLocationUpdates() {
@@ -180,6 +213,7 @@ class BackgroundDataSendService : Service() {
                 updateLocationData(location)
                 locationReceived = true
                 Log.d(TAG, "Локация обновлена: ${location.latitude}, ${location.longitude}")
+                updateNotification()
             }
         }
     }
@@ -197,6 +231,7 @@ class BackgroundDataSendService : Service() {
                         updateLocationData(location)
                         locationReceived = true
                         Log.d(TAG, "Текущая локация получена принудительно: ${location.latitude}, ${location.longitude}")
+                        updateNotification()
                     } else {
                         Log.w(TAG, "getCurrentLocation вернул null")
                         getLastKnownLocation()
@@ -221,6 +256,7 @@ class BackgroundDataSendService : Service() {
                         updateLocationData(location)
                         locationReceived = true
                         Log.d(TAG, "Последняя известная локация: ${location.latitude}, ${location.longitude}")
+                        updateNotification()
                     } else {
                         Log.e(TAG, "Нет последней известной локации")
                     }
@@ -283,12 +319,19 @@ class BackgroundDataSendService : Service() {
         sendTimer = Timer()
         sendTimer?.schedule(object : TimerTask() {
             override fun run() {
+                sendToServer = sharedPreferences.getBoolean(KEY_SEND_TO_SERVER, true)
+
                 if (!locationReceived) {
                     Log.w(TAG, "Локация еще не получена")
                     forceGetLocation()
                     return
                 }
-                sendDataToServer()
+
+                if (sendToServer) {
+                    sendDataToServer()
+                } else {
+                    saveDataToPhone()
+                }
             }
         }, 10000, sendIntervalMs)
 
@@ -298,6 +341,52 @@ class BackgroundDataSendService : Service() {
     private fun stopPeriodicSending() {
         sendTimer?.cancel()
         sendTimer = null
+    }
+
+    private fun saveDataToPhone() {
+        if (isSending) {
+            Log.d(TAG, "Предыдущее сохранение еще выполняется")
+            return
+        }
+
+        if (!locationReceived || currentLatitude == 0.0) {
+            Log.w(TAG, "Нет данных локации (lat=$currentLatitude, lon=$currentLongitude)")
+            forceGetLocation()
+        }
+
+        getCellInfo()
+        isSending = true
+
+        try {
+            val jsonData = JSONObject().apply {
+                put("latitude", currentLatitude)
+                put("longitude", currentLongitude)
+                put("altitude", currentAltitude)
+                put("timestamp", currentTimestamp)
+                put("imei", deviceImei)
+                put("cellInfo", cellInfoString)
+                put("savedAt", System.currentTimeMillis())
+                put("source", "background_service")
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                put("savedAtFormatted", dateFormat.format(Date()))
+            }
+
+            val success = saveJSON("location", jsonData, this)
+
+            if (success) {
+                Log.d(TAG, "Данные сохранены в location.json")
+                consecutiveFailures = 0
+            } else {
+                Log.e(TAG, "Ошибка сохранения данных")
+                consecutiveFailures++
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Ошибка при сохранении: ${e.message}")
+            consecutiveFailures++
+        } finally {
+            isSending = false
+        }
     }
 
     private fun sendDataToServer() {
